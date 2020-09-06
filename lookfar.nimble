@@ -1,9 +1,9 @@
 # Package
 
 version = "0.1.0"
-author = "Your Name"
-description = "lookfar"
-license = "?"
+author = "Mike Janger"
+description = "Experiments with Nim and Nico"
+license = "MIT"
 
 # Deps
 requires "nim >= 1.2.0"
