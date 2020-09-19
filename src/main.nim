@@ -2,6 +2,8 @@ import nico
 import nico/vec
 import dom
 
+const
+  tile_width = 12
 
 type
   Ship = ref object of RootObj
@@ -40,14 +42,21 @@ proc gameInit() =
   var tile = new(Tile)
   tile.center.x = ship.orig.x.int
   tile.center.y = ship.orig.y.int
-  tile.side = 6
+  tile.side = tile_width div 2
 
   tiles.add(tile)
+
+  var tile2 = new(Tile)
+  tile2.center.x = tile.center.x + tile_width
+  tile2.center.y = tile.center.y
+  tile2.side = tile_width div 2
+
+  tiles.add(tile2)
 
   # Testing
   var btn = getElementById("btn")
   btn.addEventListener("click") do(e: dom.Event):
-    ship.pos.x += 5
+    ship.pos.x += tile_width
 
 proc gameUpdate(dt: float32) =
   var yoffset = abs(ship.orig.y - ship.pos.y)
