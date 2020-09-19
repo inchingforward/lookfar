@@ -11,7 +11,12 @@ type
     bounce: float32
     rad: int
 
+  Tile = ref object of RootObj
+    center: Vec2i
+    side: int
+
 var ship: Ship
+var tiles: seq[Tile]
 
 proc gameInit() =
   loadFont(0, "font.png")
@@ -32,6 +37,13 @@ proc gameInit() =
   ship.rad = 3
   ship.bounce = 1.5
 
+  var tile = new(Tile)
+  tile.center.x = ship.orig.x.int
+  tile.center.y = ship.orig.y.int
+  tile.side = 6
+
+  tiles.add(tile)
+
   # Testing
   var btn = getElementById("btn")
   btn.addEventListener("click") do(e: dom.Event):
@@ -50,6 +62,9 @@ proc gameDraw() =
   cls()
   setColor(3)
   circ(ship.pos.x, ship.pos.y, ship.rad)
+
+  for tile in tiles:
+    rect(tile.center.x - tile.side, tile.center.y - tile.side, tile.center.x + tile.side, tile.center.y + tile.side)
 
 nico.init("inchfwd", "Lookfar")
 nico.createWindow("Lookfar", 128, 128, 4, false)
