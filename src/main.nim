@@ -2,23 +2,110 @@ import nico
 import nico/vec
 import dom
 
+
 const
   tile_width = 12
 
+
 type
+  Orientation = enum North, South, West, East
+
   Ship = ref object of RootObj
     orig: Vec2f
     pos: Vec2f
     vel: Vec2f
     bounce: float32
     rad: int
+    side: float32
+    base: float32
+    orientation: Orientation
 
+
+proc update(self: Ship, dt: float32) =
+  var yoffset = abs(self.orig.y - self.pos.y)
+
+  if (yoffset > self.bounce):
+    self.vel.y *= -1
+
+  self.pos.y += self.vel.y * dt
+
+proc draw(self: Ship) =
+  setColor(3)
+
+  var 
+    ax = 0.0
+    ay = 0.0
+    bx = 0.0
+    by = 0.0
+    cx = 0.0
+    cy = 0.0
+
+  case self.orientation:
+  of North:
+    ax = self.pos.x
+    ay = self.pos.y - self.side
+    bx = self.pos.x - self.base
+    by = self.pos.y + self.side
+    cx = self.pos.x + self.base
+    cy = self.pos.y + self.side
+  of East:
+    ax = self.pos.x + self.side
+    ay = self.pos.y
+    bx = self.pos.x - self.side
+    by = self.pos.y + self.base
+    cx = self.pos.x - self.side
+    cy = self.pos.y - self.base
+  of South:
+    ax = self.pos.x
+    ay = self.pos.y + self.side
+    bx = self.pos.x - self.base
+    by = self.pos.y - self.side
+    cx = self.pos.x + self.base
+    cy = self.pos.y - self.side
+  of West:
+    ax = self.pos.x - self.base
+    ay = self.pos.y
+    bx = self.pos.x + self.side
+    by = self.pos.y - self.base
+    cx = self.pos.x + self.side
+    cy = self.pos.y + self.base
+
+  line(ax, ay, bx, by)
+  line(bx, by, cx, cy)
+  line(cx, cy, ax, ay)
+
+type
   Tile = ref object of RootObj
     center: Vec2i
     side: int
 
 var ship: Ship
 var tiles: seq[Tile]
+
+proc handleInput(value: cstring) =
+  echo(value)
+
+  case $value:
+  of "left":
+    case ship.orientation:
+    of North: ship.orientation = West
+    of East: ship.orientation = North
+    of South: ship.orientation = East
+    of West: ship.orientation = South
+  of "right":
+    case ship.orientation:
+    of North: ship.orientation = East
+    of East: ship.orientation = South
+    of South: ship.orientation = West
+    of West: ship.orientation = North
+  of "forward":
+    case ship.orientation:
+      of North: ship.pos.y -= tile_width
+      of East: ship.pos.x += tile_width
+      of South: ship.pos.y += tile_width
+      of West: ship.pos.x -= tile_width
+  else:
+    echo("Unrecognized command: ", value)
 
 proc gameInit() =
   loadFont(0, "font.png")
@@ -38,6 +125,9 @@ proc gameInit() =
   ship.vel.y = ship.vel.x
   ship.rad = 3
   ship.bounce = 1.5
+  ship.side = 3
+  ship.base = 3
+  ship.orientation = West
 
   var tile = new(Tile)
   tile.center.x = ship.orig.x.int
@@ -53,25 +143,21 @@ proc gameInit() =
 
   tiles.add(tile2)
 
-  # Testing
-  var btn = getElementById("btn")
+  let console = getElementById("console")
+  let btn = getElementById("btn")
   btn.addEventListener("click") do(e: dom.Event):
-    ship.pos.x += tile_width
+    handleInput(console.value)
+
 
 proc gameUpdate(dt: float32) =
-  var yoffset = abs(ship.orig.y - ship.pos.y)
-
-  if (yoffset > ship.bounce):
-    ship.vel.y *= -1
-
-  ship.pos.y += ship.vel.y * dt
+  ship.update(dt)
 
 
 proc gameDraw() =
   cls()
-  setColor(3)
-  circ(ship.pos.x, ship.pos.y, ship.rad)
+  ship.draw()
 
+  setColor(3)
   for tile in tiles:
     rect(tile.center.x - tile.side, tile.center.y - tile.side, tile.center.x + tile.side, tile.center.y + tile.side)
 
