@@ -32,43 +32,23 @@ proc update(self: Ship, dt: float32) =
 proc draw(self: Ship) =
   setColor(3)
 
-  var 
-    ax = 0.0
-    ay = 0.0
-    bx = 0.0
-    by = 0.0
-    cx = 0.0
-    cy = 0.0
-
-  case self.orientation:
+  let (ax, ay, bx, by, cx, cy) = case self.orientation:
   of North:
-    ax = self.pos.x
-    ay = self.pos.y - self.side
-    bx = self.pos.x - self.base
-    by = self.pos.y + self.side
-    cx = self.pos.x + self.base
-    cy = self.pos.y + self.side
+    (self.pos.x, self.pos.y - self.side, 
+     self.pos.x - self.base, self.pos.y + self.side, 
+     self.pos.x + self.base, self.pos.y + self.side)
   of East:
-    ax = self.pos.x + self.side
-    ay = self.pos.y
-    bx = self.pos.x - self.side
-    by = self.pos.y + self.base
-    cx = self.pos.x - self.side
-    cy = self.pos.y - self.base
+    (self.pos.x + self.side, self.pos.y, 
+     self.pos.x - self.side, self.pos.y + self.base, 
+     self.pos.x - self.side, self.pos.y - self.base)
   of South:
-    ax = self.pos.x
-    ay = self.pos.y + self.side
-    bx = self.pos.x - self.base
-    by = self.pos.y - self.side
-    cx = self.pos.x + self.base
-    cy = self.pos.y - self.side
+    (self.pos.x, self.pos.y + self.side,
+     self.pos.x - self.base, self.pos.y - self.side,
+     self.pos.x + self.base, self.pos.y - self.side)
   of West:
-    ax = self.pos.x - self.base
-    ay = self.pos.y
-    bx = self.pos.x + self.side
-    by = self.pos.y - self.base
-    cx = self.pos.x + self.side
-    cy = self.pos.y + self.base
+    (self.pos.x - self.base, self.pos.y,
+     self.pos.x + self.side, self.pos.y - self.base,
+     self.pos.x + self.side, self.pos.y + self.base)
 
   line(ax, ay, bx, by)
   line(bx, by, cx, cy)
@@ -127,7 +107,7 @@ proc gameInit() =
   ship.bounce = 1.5
   ship.side = 3
   ship.base = 3
-  ship.orientation = West
+  ship.orientation = East
 
   var tile = new(Tile)
   tile.center.x = ship.orig.x.int
