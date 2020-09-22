@@ -1,6 +1,7 @@
 import nico
 import nico/vec
 import dom
+import strutils
 
 
 const
@@ -15,11 +16,9 @@ type
     pos: Vec2f
     vel: Vec2f
     bounce: float32
-    rad: int
     side: float32
     base: float32
     orientation: Orientation
-
 
 proc update(self: Ship, dt: float32) =
   var yoffset = abs(self.orig.y - self.pos.y)
@@ -63,27 +62,25 @@ var ship: Ship
 var tiles: seq[Tile]
 
 proc handleInput(value: cstring) =
-  echo(value)
-
-  case $value:
+  case ($value).strip()
   of "left":
-    case ship.orientation:
+    case ship.orientation
     of North: ship.orientation = West
     of East: ship.orientation = North
     of South: ship.orientation = East
     of West: ship.orientation = South
   of "right":
-    case ship.orientation:
+    case ship.orientation
     of North: ship.orientation = East
     of East: ship.orientation = South
     of South: ship.orientation = West
     of West: ship.orientation = North
   of "forward":
-    case ship.orientation:
-      of North: ship.pos.y -= tile_width
-      of East: ship.pos.x += tile_width
-      of South: ship.pos.y += tile_width
-      of West: ship.pos.x -= tile_width
+    case ship.orientation
+    of North: ship.pos.y -= tile_width
+    of East: ship.pos.x += tile_width
+    of South: ship.pos.y += tile_width
+    of West: ship.pos.x -= tile_width
   else:
     echo("Unrecognized command: ", value)
 
@@ -103,7 +100,6 @@ proc gameInit() =
   ship.pos.y = ship.orig.y
   ship.vel.x = 5.0
   ship.vel.y = ship.vel.x
-  ship.rad = 3
   ship.bounce = 1.5
   ship.side = 3
   ship.base = 3
