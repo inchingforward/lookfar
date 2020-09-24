@@ -60,6 +60,7 @@ type
 
 var ship: Ship
 var tiles: seq[Tile]
+var help: Element
 
 proc handleInput(value: cstring) =
   case ($value).strip()
@@ -119,11 +120,19 @@ proc gameInit() =
 
   tiles.add(tile2)
 
-  let console = getElementById("console")
-  let btn = getElementById("btn")
-  btn.addEventListener("click") do(e: dom.Event):
-    handleInput(console.value)
+  # let console = getElementById("console")
+  # let btn = getElementById("btn")
+  # btn.addEventListener("click") do(e: dom.Event):
+  #   handleInput(console.value)
+  help = getElementById("help-text")
+  help.innerText = "Help goes here"
 
+  let commands = getElementsByClassName(document, "command")
+  for command in commands:
+    command.addEventListener("click") do (e: dom.Event):
+      echo("command clicked", e.target.innerText)
+      handleInput(e.target.innerText)
+  
 
 proc gameUpdate(dt: float32) =
   ship.update(dt)

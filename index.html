@@ -24,20 +24,46 @@
 				background-color: #000;
 				color: #00bb00;
 			}
+			h3 {
+				color: #008751;
+			}
+			.command {
+				color: #008751;
+				font-weight: bold;
+				text-decoration: none;
+			}
+			.commands {
+				padding-left: 20px;
+			}
+			.commands ul { 
+            	list-style:none; 
+            	padding-left:0; 
+        	}
+        	.help {
+        		color: #008751;
+        		font-weight: bold;
+        		padding-left: 20px;
+        	}
 		</style>
 		<title>lookfar</title>
 	</head>
 	<body>
 		<div class="row">
-			<div class="column">
-				<textarea id="console" cols="40" rows="4"></textarea>
-				<br />
-				<button id="btn">Click Me</button>
+			<div class="column help">
+				<h3 id="rank">Rank: Noob</h3>
+				<div id="help-text"></div>
 			</div>
 			<div class="column">
 				<div id="nicogame"></div>
 			</div>
-			<div class="column"></div>
+			<div class="column commands">
+				<h3>Commands</h3>
+				<ul>
+					<li><a href="#" class="command">right</a></li>
+					<li><a href="#" class="command">left</a></li>
+					<li><a href="#" class="command">forward</a></li>
+				</ul>
+			</div>
 		</div>
 
 		<script type="text/javascript">
