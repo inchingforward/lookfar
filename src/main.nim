@@ -6,6 +6,8 @@ import strutils
 
 const
   tile_width = 12
+  column_length = 12
+  row_length = 12
 
 
 type
@@ -62,6 +64,11 @@ var ship: Ship
 var tiles: seq[Tile]
 var help: Element
 
+proc moveShipTo(x, y: float32) =
+  if x > 0 and x < screenWidth and y > 0 and y < screenHeight:
+    ship.pos.x = x
+    ship.pos.y = y
+
 proc handleInput(value: cstring) =
   case ($value).strip()
   of "left":
@@ -78,10 +85,10 @@ proc handleInput(value: cstring) =
     of West: ship.orientation = North
   of "forward":
     case ship.orientation
-    of North: ship.pos.y -= tile_width
-    of East: ship.pos.x += tile_width
-    of South: ship.pos.y += tile_width
-    of West: ship.pos.x -= tile_width
+    of North: moveShipTo(ship.pos.x, ship.pos.y - tile_width)
+    of East: moveShipTo(ship.pos.x + tile_width, ship.pos.y)
+    of South: moveShipTo(ship.pos.x, ship.pos.y + tile_width)
+    of West: moveShipTo(ship.pos.x - tile_width, ship.pos.y)
   else:
     echo("Unrecognized command: ", value)
 
@@ -95,8 +102,8 @@ proc gameInit() =
     discard
 
   ship = new(Ship)
-  ship.orig.x = screenWidth.float32 / 2.0
-  ship.orig.y = screenHeight.float32 / 2.0
+  ship.orig.x = 6 * tile_width + tile_width div 2
+  ship.orig.y = 6 * tile_width + tile_width div 2
   ship.pos.x = ship.orig.x
   ship.pos.y = ship.orig.y
   ship.vel.x = 5.0
@@ -106,19 +113,18 @@ proc gameInit() =
   ship.base = 3
   ship.orientation = East
 
-  var tile = new(Tile)
-  tile.center.x = ship.orig.x.int
-  tile.center.y = ship.orig.y.int
-  tile.side = tile_width div 2
+  for x in 0..column_length:
+    for y in 0..row_length:
+      var tile = new(Tile)
 
-  tiles.add(tile)
+      let currx = x * tile_width
+      let curry = y * tile_width
 
-  var tile2 = new(Tile)
-  tile2.center.x = tile.center.x + tile_width
-  tile2.center.y = tile.center.y
-  tile2.side = tile_width div 2
+      tile.center.x = currx + tile_width div 2
+      tile.center.y = curry + tile_width div 2
+      tile.side = tile_width div 2
 
-  tiles.add(tile2)
+      tiles.add(tile)
 
   # let console = getElementById("console")
   # let btn = getElementById("btn")
@@ -147,5 +153,5 @@ proc gameDraw() =
     rect(tile.center.x - tile.side, tile.center.y - tile.side, tile.center.x + tile.side, tile.center.y + tile.side)
 
 nico.init("inchfwd", "Lookfar")
-nico.createWindow("Lookfar", 128, 128, 4, false)
+nico.createWindow("Lookfar", 145, 145, 4, false)
 nico.run(gameInit, gameUpdate, gameDraw)
