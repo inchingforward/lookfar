@@ -68,6 +68,9 @@ var help: Element
 
 type
   Level = ref object of RootObj
+    number: int
+    rank: string
+    help: string
     map: string
     startingShipOrientation: Orientation
 
@@ -151,6 +154,8 @@ proc gameInit() =
     discard
 
   level = new(Level)
+  level.rank = "Noob"
+  level.number = 1
   level.map = """
     ............
     ............
@@ -165,6 +170,10 @@ proc gameInit() =
     ............
     ............"""
   level.startingShipOrientation = North
+  level.help = """This is the level help and it extends pretty far 
+    so that it will wrap.
+
+    Testing newline."""
 
   tiles = level.toTiles()
 
@@ -187,7 +196,9 @@ proc gameInit() =
   # btn.addEventListener("click") do(e: dom.Event):
   #   handleInput(console.value)
   help = getElementById("help-text")
-  help.innerText = "Help goes here"
+  help.innerText = level.help
+
+  getElementById("rank").innerText = "Rank: " & level.rank
 
   let commands = getElementsByClassName(document, "command")
   for command in commands:
