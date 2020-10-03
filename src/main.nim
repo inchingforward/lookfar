@@ -66,8 +66,12 @@ var help: Element
 
 proc moveShipTo(x, y: float32) =
   if x > 0 and x < screenWidth and y > 0 and y < screenHeight:
+    # Update the origin for idle animation
+    ship.orig.x = x
+    ship.orig.y = y
     ship.pos.x = x
     ship.pos.y = y
+
 
 proc handleInput(value: cstring) =
   case ($value).strip()
@@ -85,10 +89,10 @@ proc handleInput(value: cstring) =
     of West: ship.orientation = North
   of "forward":
     case ship.orientation
-    of North: moveShipTo(ship.pos.x, ship.pos.y - tile_width)
-    of East: moveShipTo(ship.pos.x + tile_width, ship.pos.y)
-    of South: moveShipTo(ship.pos.x, ship.pos.y + tile_width)
-    of West: moveShipTo(ship.pos.x - tile_width, ship.pos.y)
+    of North: moveShipTo(ship.orig.x, ship.orig.y - tile_width)
+    of East: moveShipTo(ship.orig.x + tile_width, ship.orig.y)
+    of South: moveShipTo(ship.orig.x, ship.orig.y + tile_width)
+    of West: moveShipTo(ship.orig.x - tile_width, ship.orig.y)
   else:
     echo("Unrecognized command: ", value)
 
