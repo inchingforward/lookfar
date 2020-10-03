@@ -22,6 +22,7 @@ type
     base: float32
     orientation: Orientation
 
+
 proc update(self: Ship, dt: float32) =
   var yoffset = abs(self.orig.y - self.pos.y)
 
@@ -59,10 +60,54 @@ type
   Tile = ref object of RootObj
     center: Vec2i
     side: int
+    visible: bool
 
 var ship: Ship
 var tiles: seq[Tile]
 var help: Element
+
+type
+  Level = ref object of RootObj
+    map: string
+    startingShipOrientation: Orientation
+
+proc toTiles(self: Level): seq[Tile] =
+  let rows = self.map.replace(" ", "").split("\n")
+  var tiles:  seq[Tile]
+
+  for y in 0..<row_length:
+    for x in 0..<column_length:
+      let ch = rows[y][x]
+
+      var tile = new(Tile)
+
+      let currx = x * tile_width
+      let curry = y * tile_width
+
+      tile.center.x = currx + tile_width div 2
+      tile.center.y = curry + tile_width div 2
+      tile.side = tile_width div 2
+
+      if ch in ['*', 'S']:
+        tile.visible = true
+
+      tiles.add(tile)
+      
+  return tiles
+
+proc getShipStartingPos(self: Level): Vec2f =
+  var pos: Vec2f
+  let rows = self.map.replace(" ", "").split("\n")
+
+  for y in 0..<row_length:
+    for x in 0..<column_length:
+      if rows[y][x] == 'S':
+        pos.x = float32(x * tile_width + tile_width div 2)
+        pos.y = float32(y * tile_width + tile_width div 2)
+
+  return pos
+
+var level: Level
 
 proc moveShipTo(x, y: float32) =
   if x > 0 and x < screenWidth and y > 0 and y < screenHeight:
@@ -105,30 +150,37 @@ proc gameInit() =
   dom.window.onkeyup = proc(event: dom.Event) =
     discard
 
+  level = new(Level)
+  level.map = """
+    ............
+    ............
+    ............
+    ............
+    ......***...
+    ......*.....
+    ......S.....
+    ............
+    ............
+    ............
+    ............
+    ............"""
+  level.startingShipOrientation = North
+
+  tiles = level.toTiles()
+
+  let startingPos = level.getShipStartingPos()
+
   ship = new(Ship)
-  ship.orig.x = 6 * tile_width + tile_width div 2
-  ship.orig.y = 6 * tile_width + tile_width div 2
-  ship.pos.x = ship.orig.x
-  ship.pos.y = ship.orig.y
+  ship.orig.x = startingPos.x
+  ship.orig.y = startingPos.y
+  ship.pos.x = startingPos.x
+  ship.pos.y = startingPos.y
   ship.vel.x = 5.0
   ship.vel.y = ship.vel.x
   ship.bounce = 1.5
   ship.side = 3
   ship.base = 3
-  ship.orientation = East
-
-  for x in 0..column_length:
-    for y in 0..row_length:
-      var tile = new(Tile)
-
-      let currx = x * tile_width
-      let curry = y * tile_width
-
-      tile.center.x = currx + tile_width div 2
-      tile.center.y = curry + tile_width div 2
-      tile.side = tile_width div 2
-
-      tiles.add(tile)
+  ship.orientation = level.startingShipOrientation
 
   # let console = getElementById("console")
   # let btn = getElementById("btn")
@@ -154,7 +206,8 @@ proc gameDraw() =
 
   setColor(3)
   for tile in tiles:
-    rect(tile.center.x - tile.side, tile.center.y - tile.side, tile.center.x + tile.side, tile.center.y + tile.side)
+    if tile.visible:
+      rect(tile.center.x - tile.side, tile.center.y - tile.side, tile.center.x + tile.side, tile.center.y + tile.side)
 
 nico.init("inchfwd", "Lookfar")
 nico.createWindow("Lookfar", 145, 145, 4, false)
