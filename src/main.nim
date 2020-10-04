@@ -112,13 +112,23 @@ proc getShipStartingPos(self: Level): Vec2f =
 
 var level: Level
 
+proc tileAt(x, y: int): Tile =
+  let row = y div tile_width
+  let col = x div tile_width
+  let index = row * tile_width + col
+
+  return tiles[index]
+
+
 proc moveShipTo(x, y: float32) =
   if x > 0 and x < screenWidth and y > 0 and y < screenHeight:
-    # Update the origin for idle animation
-    ship.orig.x = x
-    ship.orig.y = y
-    ship.pos.x = x
-    ship.pos.y = y
+    let tile = tileAt(x.int, y.int)
+
+    if tile.visible:
+      ship.orig.x = x
+      ship.orig.y = y
+      ship.pos.x = x
+      ship.pos.y = y
 
 
 proc handleInput(value: cstring) =
